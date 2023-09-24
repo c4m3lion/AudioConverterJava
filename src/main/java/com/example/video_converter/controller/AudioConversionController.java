@@ -43,13 +43,17 @@ public class AudioConversionController {
         return ResponseEntity.ok().body(fileDownloadUri);
     }
 
-    @GetMapping("/download/{filename}")
+    @GetMapping("/download/{filename:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
-        Path filePath = Paths.get(audioConversionService.getRoot(), filename);
-        Resource resource = new FileSystemResource(filePath);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+        try {
+            Path filePath = Paths.get(audioConversionService.getRoot(), filename);
+            Resource resource = new FileSystemResource(filePath);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        }catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     private File convertMultipartFileToFile(MultipartFile file) throws IOException {
